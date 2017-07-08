@@ -134,7 +134,7 @@ namespace Project
 
             // Bullet texture
 
-            bulletTexture = content.Load<Texture2D>("Textures/Dude/head");
+            bulletTexture = content.Load<Texture2D>("Textures/Level/bullet");
             // Создание объекта Игрок
             #region
             player1 = new Player(Scale, 1.2f);
@@ -199,9 +199,11 @@ namespace Project
                 }
             if (currK.IsKeyDown(Keys.W) || currPad1K.Buttons.A == ButtonState.Pressed)
                 player1.Move(gameTime, LookDirection.Up);
+            Vector2 player1DrawPosition =
+                new Vector2((player1.Position.X + Position.X) * Scale, (player1.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);           
             if (currK.IsKeyDown(Keys.Space) || currPad1K.Buttons.X == ButtonState.Pressed)
             {
-                FireBullet(gameTime, player1.Position, player1.CurrentDirection);
+                FireBullet(gameTime, player1DrawPosition, player1.CurrentDirection);
             }
             #endregion
 
@@ -213,9 +215,11 @@ namespace Project
                 player2.Move(gameTime, LookDirection.Right);
             if (currK.IsKeyDown(Keys.Up) || currPad2K.Buttons.A == ButtonState.Pressed)
                 player2.Move(gameTime, LookDirection.Up);
+            Vector2 player2DrawPosition =
+               new Vector2((player2.Position.X + Position.X) * Scale, (player2.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);
             if (currK.IsKeyDown(Keys.Enter) || currPad2K.Buttons.X == ButtonState.Pressed)
             {
-                FireBullet(gameTime, player2.Position, player2.CurrentDirection);
+                FireBullet(gameTime, player2DrawPosition, player2.CurrentDirection);
             }
             #endregion
 
@@ -235,10 +239,10 @@ namespace Project
 
             // Скрыть/Показать Debug Drawer
             #region
-            //if (currK.IsKeyDown(Keys.RightControl) && currK.IsKeyDown(Keys.Tab) && prevK.IsKeyUp(Keys.Tab))
-            //    debugDrawer.Active = !debugDrawer.Active;
-            if (currK.IsKeyDown(Keys.Tab))
+            if (currK.IsKeyDown(Keys.LeftControl) && currK.IsKeyDown(Keys.Tab) && prevK.IsKeyUp(Keys.Tab))
                 debugDrawer.Active = !debugDrawer.Active;
+            //if (currK.IsKeyDown(Keys.Tab))
+            //    debugDrawer.Active = !debugDrawer.Active;
             #endregion
 
             //Scale += sRate * 0.005f;
@@ -251,6 +255,7 @@ namespace Project
                 Console.WriteLine("Width = " + Width);
                 if (!bulletBeams[i].Active || bulletBeams[i].Position.X > Width)
                 {
+                    Console.WriteLine("Remove");
                     bulletBeams.Remove(bulletBeams[i]);
                 }
             }
@@ -288,6 +293,12 @@ namespace Project
             DrawFog(spriteBatch);
 
             Fade.Draw(spriteBatch);
+            
+            // Draw the lasers.
+            foreach (Bullet b in bulletBeams)
+            {
+                b.Draw(spriteBatch);
+            }
 
             debugDrawer.Clear();
             debugDrawer.AddDebugLine("Scale", Scale.ToString());

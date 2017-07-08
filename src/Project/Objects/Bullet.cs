@@ -41,15 +41,18 @@ namespace Project
         public void Update(GameTime gameTime)
         {
             Position.X += BulletMoveSpeed;
-
-            Console.WriteLine("!!!2");
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            Console.WriteLine("+++");
+            SpriteEffects effects = SpriteEffects.None;
+            spriteBatch.Begin();
             spriteBatch.Draw(BulletSprite, Position, null, Color.White, 0f, Vector2.Zero, 1f,
 
-       SpriteEffects.None, 0f);
+      SpriteEffects.None, 0f);
+            spriteBatch.End();
+            Console.WriteLine("+++2");
         }
     }
 }

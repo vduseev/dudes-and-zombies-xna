@@ -29,6 +29,7 @@ namespace Project
 
         int currentFrame = 0;
         int currentFrameInStep = 0;
+        public Vector2 Position;
 
         public void Initialize(Texture2D texture, 
             int framesAmount,

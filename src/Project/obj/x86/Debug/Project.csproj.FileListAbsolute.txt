@@ -78,3 +78,4 @@ C:\Game\dudes-and-zombies-monogame\src\Project\bin\Windows\x86\Debug\SharpDX.XIn
 C:\Game\dudes-and-zombies-monogame\src\Project\bin\Windows\x86\Debug\SharpDX.Direct3D9.xml
 C:\Game\dudes-and-zombies-monogame\src\Project\obj\x86\Debug\Project.csprojResolveAssemblyReference.cache
 C:\Game\dudes-and-zombies-monogame\src\Project\bin\Windows\x86\Debug\Content\Textures\Level\bullet.xnb
+C:\Game\dudes-and-zombies-monogame\src\Project\bin\Windows\x86\Debug\Content\Textures\Level\player.xnb

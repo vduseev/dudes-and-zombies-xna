@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/tree2.png</SourceFile>
-  <SourceTime>2017-06-01T10:08:59.1557391+02:00</SourceTime>
-  <DestFile>C:/Game/dudes-and-zombies-monogame/src/Project/Content/bin/Windows/Textures/Level/tree2.xnb</DestFile>
-  <DestTime>2017-07-08T17:14:26.492041+02:00</DestTime>
+  <SourceFile>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/player.png</SourceFile>
+  <SourceTime>2013-06-28T23:20:15+02:00</SourceTime>
+  <DestFile>C:/Game/dudes-and-zombies-monogame/src/Project/Content/bin/Windows/Textures/Level/player.xnb</DestFile>
+  <DestTime>2017-07-08T17:15:47.634682+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2017-03-01T16:05:36+01:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
