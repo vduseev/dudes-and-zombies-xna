@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>Windows</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Dude/bodyBlue.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Dude/bodyRed.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Dude/head.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Dude/legs.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/fog.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/ground.jpg</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/ground1.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/ground2.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/hills1.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/hills2.bmp</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/tree1.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/tree2.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/tree3.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/tree4.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Zombie/head.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Zombie/smw.png</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/DebugFont.spritefont</File>
+    <File>C:/Game/dudes-and-zombies-monogame/src/Project/Content/Textures/Level/bullet.png</File>
+  </SourceFiles>
+</SourceFileCollection>
