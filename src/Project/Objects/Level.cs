@@ -102,7 +102,7 @@ namespace Project
             // init our Bullet
             bulletBeams = new List<Bullet>();
             const float SECONDS_IN_MINUTE = 60f;
-            const float RATE_OF_FIRE = 200f;
+            const float RATE_OF_FIRE = 300f;
             bulletSpawnTime = TimeSpan.FromSeconds(SECONDS_IN_MINUTE / RATE_OF_FIRE);
             previousBulletSpawnTime = TimeSpan.Zero;
         }
@@ -251,11 +251,8 @@ namespace Project
             {
                 bulletBeams[i].Update(gameTime);
                 // Remove the beam when its deactivated or is at the end of the screen.
-                Console.WriteLine("Bullet position = " + bulletBeams[i].Position.X);
-                Console.WriteLine("Width = " + Width);
-                if (!bulletBeams[i].Active || bulletBeams[i].Position.X > Width)
+                if (!bulletBeams[i].Active || bulletBeams[i].Position.X > Width || bulletBeams[i].Position.X < 0)
                 {
-                    Console.WriteLine("Remove");
                     bulletBeams.Remove(bulletBeams[i]);
                 }
             }
@@ -304,9 +301,9 @@ namespace Project
             debugDrawer.AddDebugLine("Scale", Scale.ToString());
             debugDrawer.AddDebugLine("Level", Position.X.ToString());
             debugDrawer.AddDebugLine("PL1dx", player1DrawPosition.X.ToString());
-            debugDrawer.AddDebugLine("PL1dy", player1DrawPosition.Y.ToString());
             debugDrawer.AddDebugLine("PL1x", player1.Position.X.ToString());
-            debugDrawer.AddDebugLine("PL2y", player1.Position.Y.ToString());
+            debugDrawer.AddDebugLine("PL2dx", player2DrawPosition.X.ToString());
+            debugDrawer.AddDebugLine("PL2x", player2.Position.X.ToString());
             debugDrawer.AddDebugLine("Height", Height.ToString());
             debugDrawer.AddDebugLine("Bullets", bulletBeams.Count.ToString());
             debugDrawer.DrawDebugInfo(spriteBatch, graphicsDevice, Color.LightGreen);
@@ -548,7 +545,6 @@ namespace Project
             bullet.Initialize(bulletTexture, position, lookDirection);
            
             bulletBeams.Add(bullet);
-            Console.WriteLine("!!!");
 
         }
     }
