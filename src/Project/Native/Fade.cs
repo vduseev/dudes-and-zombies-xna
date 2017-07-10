@@ -44,7 +44,7 @@ namespace Native
            this.sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
         }
 
-        public Fade(GraphicsDeviceManager graphics, Texture2D fadeTexture)
+        public Fade(Texture2D fadeTexture)
         {
             this.fadeTexture = fadeTexture;
             posX = 0;

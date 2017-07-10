@@ -13,7 +13,7 @@ namespace Project
         public string Data;
     }
 
-    class DebugDrawer
+    class DebugDrawer : IDisposable
     {
         List<DebugLine> DebugOutput;
         SpriteFont font;
@@ -72,5 +72,11 @@ namespace Project
                 spriteBatch.End();
             }
         }
+
+        public void Dispose()
+        {
+            backGround.Dispose();
+        }
+
     }
 }

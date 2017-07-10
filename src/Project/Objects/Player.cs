@@ -12,7 +12,7 @@ namespace Project
 
     enum LookDirection2 { Left, Right, Up, Down }
 
-    class Player
+    class Player : IDisposable
     {
         // Характеристики игрока
         public bool Alive;
@@ -46,7 +46,6 @@ namespace Project
         #endregion
 
         float heightInMetres;
-        public float Proportion;
         public Vector2 Speed = Vector2.Zero;
         public float RunSpeed = 2f;
         public float JumpSpeed = 5f;
@@ -93,17 +92,16 @@ namespace Project
             );
 
             // Вычисление пропорционального соотношения
-            Proportion = (float)headTexture.Height / (float)headTexture.Width;
+            float headProportion = (float)headTexture.Height / (float)headTexture.Width;
             cHeadHeight = (int)((float)headTexture.Height * heightInMetres);
-            cHeadWidth = (int)(cHeadHeight / Proportion);
-
-            Proportion = (float)bodyTexture.Height / (float)bodyTexture.Width;
+            cHeadWidth = (int)(cHeadHeight / headProportion);
+            
             cBodyHeight = (int)(bodyTexture.Height * heightInMetres);
             cBodyWidth = cHeadWidth;
 
-            Proportion = (float)walkAnimationTexture.Height / (float)walkAnimation.FrameWidth;
+            float legsProportion = (float)walkAnimationTexture.Height / (float)walkAnimation.FrameWidth;
             cLegsHeight = (int)(walkAnimationTexture.Height * heightInMetres);
-            cLegsWidth = (int)(cLegsHeight / Proportion);
+            cLegsWidth = (int)(cLegsHeight / legsProportion);
 
             cHeight = cHeadHeight + cBodyHeight + cLegsHeight;
         }
@@ -210,6 +208,12 @@ namespace Project
                 new Rectangle((int)(drawPosition.X - legsWidth / 2), (int)(drawPosition.Y - legsHeight), legsWidth, legsHeight),
                 effects);
             #endregion
+        }
+
+        public void Dispose()
+        {
+            headTexture.Dispose();
+            bodyTexture.Dispose();
         }
 
     }

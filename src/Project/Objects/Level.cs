@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Project
 {
-    class Level
+    class Level: IDisposable
     {
         // Характеристики уровня
         #region
@@ -546,6 +546,27 @@ namespace Project
            
             bulletBeams.Add(bullet);
 
+        }
+
+        public void Dispose()
+        {
+            #region
+            GroundTexture.Dispose();
+            GroundNearTexture.Dispose();
+            TreesFirstTexture.Dispose();
+            debugDrawer.Dispose();
+            TreesSecondTexture.Dispose();
+            TreesThirdTexture.Dispose();
+            TreesFourthTexture.Dispose();
+            HillsNearTexture.Dispose();
+            HillsFarTexture.Dispose();
+            BackgroundTexture.Dispose();
+            BorderTexture.Dispose();
+            FogTexture.Dispose();
+            player1.Dispose();
+            player2.Dispose();
+            bulletTexture.Dispose();
+            #endregion
         }
     }
 }
