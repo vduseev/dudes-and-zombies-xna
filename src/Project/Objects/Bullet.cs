@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
-namespace Project
+namespace Project.Objects
 {
     class Bullet
     {
@@ -12,35 +11,27 @@ namespace Project
 
         public Vector2 Position;
 
-        int Damage = 10;
+        //int Damage = 10;
 
         public bool Active;
 
-        int Range;
+        LookDirection _bulletDirection;
 
-        LookDirection LookDirection;
+        public int Width => BulletSprite.Width;
 
-        public int Width
-        {
-            get { return BulletSprite.Width; }
-        }
+        public int Height => BulletSprite.Height;
 
-        public int Height
-        {
-            get { return BulletSprite.Height; }
-        }
-
-        public void Initialize(Texture2D texture, Vector2 position, LookDirection lookDirection)
+        public void Initialize(Texture2D texture, Vector2 position, LookDirection bulletDirection)
         {
             BulletSprite = texture;
             Position = position;
-            LookDirection = lookDirection;
+            _bulletDirection = bulletDirection;
             Active = true;
         }
 
         public void Update(GameTime gameTime)
         {
-            if (LookDirection == LookDirection.Right)
+            if (_bulletDirection == LookDirection.Right)
             {
                 Position.X += BulletMoveSpeed;
             }

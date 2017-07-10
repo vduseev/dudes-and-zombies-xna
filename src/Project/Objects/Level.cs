@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Project.Physics;
+using Project.Native;
 
-namespace Project
+namespace Project.Objects
 {
     class Level: IDisposable
     {
         // Характеристики уровня
         #region
-        public int cWidth;
-        public int cHeight;
-        public int cGroundLevel;
+        public int CWidth;
+        public int CHeight;
+        public int CGroundLevel;
         public int Width;
         public int Height;
         public int GroundLevel;
@@ -22,238 +24,230 @@ namespace Project
         #endregion
 
         // Общие для игры объекты
-        GraphicsDevice device;
-        GraphicsDeviceManager graphics;
-        ContentManager content;
-        DebugDrawer debugDrawer;
+        GraphicsDevice _graphicsDevice;
+        GraphicsDeviceManager _graphicsDeviceManager;
+        ContentManager _contentManager;
+        DebugDrawer _debugDrawer;
 
         // Общие для игры переменные
-        float Scale;
+        float _scale;
         // Разрешение экрана
-        int ScreenWidth;
-        int ScreenHeight;
+        int _screenWidth;
+        int _screenHeight;
 
         // Текстуры уровня
         #region
-        Texture2D GroundTexture;
-        Texture2D GroundNearTexture;
-        Texture2D TreesFirstTexture;
-        Texture2D TreesSecondTexture;
-        Texture2D TreesThirdTexture;
-        Texture2D TreesFourthTexture;
-        Texture2D HillsNearTexture;
-        Texture2D HillsFarTexture;
-        Texture2D BackgroundTexture;
-        Texture2D BorderTexture;
+        Texture2D _groundTexture;
+        Texture2D _groundNearTexture;
+        Texture2D _treesFirstTexture;
+        Texture2D _treesSecondTexture;
+        Texture2D _treesThirdTexture;
+        Texture2D _treesFourthTexture;
+        Texture2D _hillsNearTexture;
+        Texture2D _hillsFarTexture;
+        Texture2D _backgroundTexture;
+        Texture2D _borderTexture;
         #endregion
 
-        Texture2D FogTexture;
-        Native.Fade Fade;
+        Texture2D _fogTexture;
+        Fade _fade;
 
         // Объекты уровня
-        Player player1;
-        Player player2;
-        ZombieHandler zombieHandler;
-        Random random;
+        Player _player1;
+        Player _player2;
 
         // bullet texture
-        Texture2D bulletTexture;
+        Texture2D _bulletTexture;
 
-        List<Bullet> bulletBeams;
+        List<Bullet> _bulletBeams;
 
         // насколько быстро могут происходить выстрелы
-        TimeSpan bulletSpawnTime;
-        TimeSpan previousBulletSpawnTime;
+        TimeSpan _bulletSpawnTime;
+        TimeSpan _previousBulletSpawnTime;
         // Переменные управления
-        KeyboardState prevK;
-        KeyboardState currK;
-        GamePadState prevPad1K;
-        GamePadState currPad1K;
-        GamePadState prevPad2K;
-        GamePadState currPad2K;
+        KeyboardState _prevK;
+        KeyboardState _currK;
+        GamePadState _currPad1K;
+        GamePadState _currPad2K;
 
-        int sRate = 1;
-
-        public Level(GraphicsDevice device, GraphicsDeviceManager graphics, ContentManager content, float scale)
+        public Level(GraphicsDevice graphicsDevice, GraphicsDeviceManager graphicsDeviceManager, ContentManager contentManager, float scale)
         {
             // Копирование ссылок на общеигровые объекты
             #region
-            this.device = device;
-            this.graphics = graphics;
-            this.content = content;
-            this.Scale = scale;
-            ScreenWidth = graphics.PreferredBackBufferWidth;
-            ScreenHeight = graphics.PreferredBackBufferHeight;
+            _graphicsDevice = graphicsDevice;
+            _graphicsDeviceManager = graphicsDeviceManager;
+            _contentManager = contentManager;
+            _scale = scale;
+            _screenWidth = graphicsDeviceManager.PreferredBackBufferWidth;
+            _screenHeight = graphicsDeviceManager.PreferredBackBufferHeight;
             #endregion
 
             // Размеры уровня
             #region
-            cWidth = 30 * Physics.World.PixelsPerMetr;
-            cHeight = 5 * Physics.World.PixelsPerMetr;
-            cGroundLevel = (int)(1.1f * Physics.World.PixelsPerMetr);
-            Width = (int)(cWidth * Scale);
-            Height = (int)(cHeight * Scale);
-            GroundLevel = (int)(cGroundLevel * Scale);
+            CWidth = 30 * World.PixelsPerMetr;
+            CHeight = 5 * World.PixelsPerMetr;
+            CGroundLevel = (int)(1.1f * World.PixelsPerMetr);
+            Width = (int)(CWidth * _scale);
+            Height = (int)(CHeight * _scale);
+            GroundLevel = (int)(CGroundLevel * _scale);
             #endregion
 
             // Разместить уровень посередине
-            Position = new Vector2(ScreenWidth / 2 - Width / 2, 0);
+            Position = new Vector2(_screenWidth / 2 - Width / 2, 0);
 
             // init our Bullet
-            bulletBeams = new List<Bullet>();
-            const float SECONDS_IN_MINUTE = 60f;
-            const float RATE_OF_FIRE = 300f;
-            bulletSpawnTime = TimeSpan.FromSeconds(SECONDS_IN_MINUTE / RATE_OF_FIRE);
-            previousBulletSpawnTime = TimeSpan.Zero;
+            _bulletBeams = new List<Bullet>();
+            const float secondsInMinute = 60f;
+            const float rateOfFire = 300f;
+            _bulletSpawnTime = TimeSpan.FromSeconds(secondsInMinute / rateOfFire);
+            _previousBulletSpawnTime = TimeSpan.Zero;
         }
 
         public void LoadContent()
         {
             #region Текстуры
             // Текстуры уровня
-            GroundTexture = content.Load<Texture2D>("Textures/Level/ground1");
-            GroundNearTexture = content.Load<Texture2D>("Textures/Level/ground2");
-            TreesFirstTexture = content.Load<Texture2D>("Textures/Level/tree1");
-            TreesSecondTexture = content.Load<Texture2D>("Textures/Level/tree2");
-            TreesThirdTexture = content.Load<Texture2D>("Textures/Level/tree3");
-            TreesFourthTexture = content.Load<Texture2D>("Textures/Level/tree4");
-            HillsNearTexture = content.Load<Texture2D>("Textures/Level/hills1");
-            HillsFarTexture = content.Load<Texture2D>("Textures/Level/hills2");
+            _groundTexture = _contentManager.Load<Texture2D>("Textures/Level/ground1");
+            _groundNearTexture = _contentManager.Load<Texture2D>("Textures/Level/ground2");
+            _treesFirstTexture = _contentManager.Load<Texture2D>("Textures/Level/tree1");
+            _treesSecondTexture = _contentManager.Load<Texture2D>("Textures/Level/tree2");
+            _treesThirdTexture = _contentManager.Load<Texture2D>("Textures/Level/tree3");
+            _treesFourthTexture = _contentManager.Load<Texture2D>("Textures/Level/tree4");
+            _hillsNearTexture = _contentManager.Load<Texture2D>("Textures/Level/hills1");
+            _hillsFarTexture = _contentManager.Load<Texture2D>("Textures/Level/hills2");
 
-            FogTexture = content.Load<Texture2D>("Textures/Level/fog");
+            _fogTexture = _contentManager.Load<Texture2D>("Textures/Level/fog");
 
             // Текстура фона
-            Color BackgroundColor = Color.DarkSlateBlue;
+            Color backgroundColor = Color.DarkSlateBlue;
             // Текстура границ
-            Color BorderColor = Color.Black;
-            BackgroundTexture = new Texture2D(device, 1, 1);
-            BackgroundTexture.SetData<Color>(new Color[] { BackgroundColor });
-            BorderTexture = new Texture2D(device, 1, 1);
-            BorderTexture.SetData<Color>(new Color[] { BorderColor });
+            Color borderColor = Color.Black;
+            _backgroundTexture = new Texture2D(_graphicsDevice, 1, 1);
+            _backgroundTexture.SetData(new[] { backgroundColor });
+            _borderTexture = new Texture2D(_graphicsDevice, 1, 1);
+            _borderTexture.SetData(new[] { borderColor });
             #endregion
 
             // Bullet texture
 
-            bulletTexture = content.Load<Texture2D>("Textures/Level/bullet");
+            _bulletTexture = _contentManager.Load<Texture2D>("Textures/Level/bullet");
             // Создание объекта Игрок
             #region
-            player1 = new Player(Scale, 1.2f);
-            player2 = new Player(Scale, 1.2f);
-            player1.LoadContent(content, Color.Red);
-            player2.LoadContent(content, Color.Blue);
-            player1.Position = // Относительно уровня
-                new Vector2(-Position.X + ScreenWidth / 2, 
-                            ScreenHeight / 2 + cHeight / 2 - cGroundLevel);
-            player2.Position = // Относительно уровня
-                new Vector2(-Position.X + ScreenWidth / 2 + 2 * Physics.World.PixelsPerMetr , 
-                            ScreenHeight / 2 + cHeight / 2 - cGroundLevel);
-            player1.CurrentDirection = LookDirection.Left;
-            player2.CurrentDirection = LookDirection.Right;
+            _player1 = new Player(_scale, 1.2f);
+            _player2 = new Player(_scale, 1.2f);
+            _player1.LoadContent(_contentManager, Color.Red);
+            _player2.LoadContent(_contentManager, Color.Blue);
+            _player1.Position = // Относительно уровня
+                new Vector2((float)(-Position.X + _screenWidth / 2.0), 
+                            _screenHeight / 2 + CHeight / 2 - CGroundLevel);
+            _player2.Position = // Относительно уровня
+                new Vector2((float)(-Position.X + _screenWidth / 2.0 + 2 * World.PixelsPerMetr) , 
+                            _screenHeight / 2 + CHeight / 2 - CGroundLevel);
+            _player1.CurrentDirection = LookDirection.Left;
+            _player2.CurrentDirection = LookDirection.Right;
             #endregion
 
             // Дебаг отрисовщик
             #region
-            debugDrawer = new DebugDrawer();
-            SpriteFont font = content.Load<SpriteFont>("DebugFont");
-            debugDrawer.Load(font);
+            _debugDrawer = new DebugDrawer();
+            SpriteFont font = _contentManager.Load<SpriteFont>("DebugFont");
+            _debugDrawer.Load(font);
             #endregion
 
             // Fade объект
-            Fade = new Native.Fade(graphics);
-            Fade.fadeOut();
+            _fade = new Fade(_graphicsDeviceManager);
+            _fade.FadeOut();
         }
 
         public void Update(GameTime gameTime)
         {
-            Width = (int)(cWidth * Scale);
-            Height = (int)(cHeight * Scale);
+            Width = (int)(CWidth * _scale);
+            Height = (int)(CHeight * _scale);
             // Высота земли, земляного уровня от пола
-            GroundLevel = (int)(cGroundLevel * Scale);
+            GroundLevel = (int)(CGroundLevel * _scale);
             
             // Затемнение
-            Fade.Update(gameTime);
+            _fade.Update(gameTime);
             
             // Управление
-            prevK = currK;
-            currK = Keyboard.GetState();
+            _prevK = _currK;
+            _currK = Keyboard.GetState();
 
             // Джойстик
-            prevPad1K = currPad1K;
-            currPad1K = GamePad.GetState(PlayerIndex.One);
-            prevPad2K = currPad2K;
-            currPad2K = GamePad.GetState(PlayerIndex.Two);
+            _currPad1K = GamePad.GetState(PlayerIndex.One);
+            _currPad2K = GamePad.GetState(PlayerIndex.Two);
 
 
             // Player1
             #region
-            int safeDistance = (int)(1 * Physics.World.PixelsPerMetr * Scale);
-            if (currK.IsKeyDown(Keys.A) || currPad1K.DPad.Left == ButtonState.Pressed)
-                if (player1.Position.X > safeDistance)
+            int safeDistance = (int)(1 * World.PixelsPerMetr * _scale);
+            if (_currK.IsKeyDown(Keys.A) || _currPad1K.DPad.Left == ButtonState.Pressed)
+                if (_player1.Position.X > safeDistance)
                 {
-                    player1.Move(gameTime, LookDirection.Left);
+                    _player1.Move(gameTime, LookDirection.Left);
                 }
-            if (currK.IsKeyDown(Keys.D) || currPad1K.DPad.Right == ButtonState.Pressed)
-                if (player1.Position.X < Width - safeDistance)
+            if (_currK.IsKeyDown(Keys.D) || _currPad1K.DPad.Right == ButtonState.Pressed)
+                if (_player1.Position.X < Width - safeDistance)
                 {
-                    player1.Move(gameTime, LookDirection.Right);
+                    _player1.Move(gameTime, LookDirection.Right);
                 }
-            if (currK.IsKeyDown(Keys.W) || currPad1K.Buttons.A == ButtonState.Pressed)
-                player1.Move(gameTime, LookDirection.Up);
+            if (_currK.IsKeyDown(Keys.W) || _currPad1K.Buttons.A == ButtonState.Pressed)
+                _player1.Move(gameTime, LookDirection.Up);
             Vector2 player1DrawPosition =
-                new Vector2((player1.Position.X + Position.X) * Scale, (player1.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);           
-            if (currK.IsKeyDown(Keys.Space) || currPad1K.Buttons.X == ButtonState.Pressed)
+                new Vector2((_player1.Position.X + Position.X) * _scale, (float)((_player1.Position.Y - _screenHeight / 2.0) * _scale + _screenHeight / 2.0));
+            if (_currK.IsKeyDown(Keys.Space) || _currPad1K.Buttons.X == ButtonState.Pressed)
             {
-                FireBullet(gameTime, player1DrawPosition, player1.CurrentDirection);
+                FireBullet(gameTime, player1DrawPosition, _player1.CurrentDirection);
             }
             #endregion
 
             // Player2
             #region
-            if (currK.IsKeyDown(Keys.Left) || currPad2K.DPad.Left == ButtonState.Pressed)
-                player2.Move(gameTime, LookDirection.Left);
-            if (currK.IsKeyDown(Keys.Right) || currPad2K.DPad.Right == ButtonState.Pressed)
-                player2.Move(gameTime, LookDirection.Right);
-            if (currK.IsKeyDown(Keys.Up) || currPad2K.Buttons.A == ButtonState.Pressed)
-                player2.Move(gameTime, LookDirection.Up);
+            if (_currK.IsKeyDown(Keys.Left) || _currPad2K.DPad.Left == ButtonState.Pressed)
+                _player2.Move(gameTime, LookDirection.Left);
+            if (_currK.IsKeyDown(Keys.Right) || _currPad2K.DPad.Right == ButtonState.Pressed)
+                _player2.Move(gameTime, LookDirection.Right);
+            if (_currK.IsKeyDown(Keys.Up) || _currPad2K.Buttons.A == ButtonState.Pressed)
+                _player2.Move(gameTime, LookDirection.Up);
             Vector2 player2DrawPosition =
-               new Vector2((player2.Position.X + Position.X) * Scale, (player2.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);
-            if (currK.IsKeyDown(Keys.Enter) || currPad2K.Buttons.X == ButtonState.Pressed)
+               new Vector2((_player2.Position.X + Position.X) * _scale, (float)((_player2.Position.Y - _screenHeight / 2.0) * _scale + _screenHeight / 2.0));
+            if (_currK.IsKeyDown(Keys.Enter) || _currPad2K.Buttons.X == ButtonState.Pressed)
             {
-                FireBullet(gameTime, player2DrawPosition, player2.CurrentDirection);
+                FireBullet(gameTime, player2DrawPosition, _player2.CurrentDirection);
             }
             #endregion
 
             // Обновление игрока
-            player1.Update(gameTime, Scale, ScreenHeight / 2 + cHeight / 2 - cGroundLevel);
-            player2.Update(gameTime, Scale, ScreenHeight / 2 + cHeight / 2 - cGroundLevel);
+            _player1.Update(gameTime, _scale, _screenHeight / 2 + CHeight / 2 - CGroundLevel);
+            _player2.Update(gameTime, _scale, _screenHeight / 2 + CHeight / 2 - CGroundLevel);
 
             // Увеличение масштаба
             #region
-            if (currK.IsKeyDown(Keys.RightControl) && currK.IsKeyDown(Keys.OemPlus) && prevK.IsKeyUp(Keys.OemPlus))
-                Scale += 0.1f;
-            if (currK.IsKeyDown(Keys.RightControl) && currK.IsKeyDown(Keys.OemMinus) && prevK.IsKeyUp(Keys.OemMinus))
-                Scale -= 0.1f;
-            if (Scale < 0.8f) { Scale = 0.8f; sRate *= -1; }
-            if (Scale > 1.6f) { Scale = 1.6f; sRate *= -1; }
+            if (_currK.IsKeyDown(Keys.RightControl) && _currK.IsKeyDown(Keys.OemPlus) && _prevK.IsKeyUp(Keys.OemPlus))
+                _scale += 0.1f;
+            if (_currK.IsKeyDown(Keys.RightControl) && _currK.IsKeyDown(Keys.OemMinus) && _prevK.IsKeyUp(Keys.OemMinus))
+                _scale -= 0.1f;
+            if (_scale < 0.8f) { _scale = 0.8f; }
+            if (_scale > 1.6f) { _scale = 1.6f; }
             #endregion
 
             // Скрыть/Показать Debug Drawer
             #region
-            if (currK.IsKeyDown(Keys.LeftControl) && currK.IsKeyDown(Keys.Tab) && prevK.IsKeyUp(Keys.Tab))
-                debugDrawer.Active = !debugDrawer.Active;
+            if (_currK.IsKeyDown(Keys.LeftControl) && _currK.IsKeyDown(Keys.Tab) && _prevK.IsKeyUp(Keys.Tab))
+                _debugDrawer.Active = !_debugDrawer.Active;
             //if (currK.IsKeyDown(Keys.Tab))
             //    debugDrawer.Active = !debugDrawer.Active;
             #endregion
 
             //Scale += sRate * 0.005f;
             // update bulletbeams
-            for (var i = 0; i < bulletBeams.Count; i++)
+            for (var i = 0; i < _bulletBeams.Count; i++)
             {
-                bulletBeams[i].Update(gameTime);
+                _bulletBeams[i].Update(gameTime);
                 // Remove the beam when its deactivated or is at the end of the screen.
-                if (!bulletBeams[i].Active || bulletBeams[i].Position.X > Width || bulletBeams[i].Position.X < 0)
+                if (!_bulletBeams[i].Active || _bulletBeams[i].Position.X > Width || _bulletBeams[i].Position.X < 0)
                 {
-                    bulletBeams.Remove(bulletBeams[i]);
+                    _bulletBeams.Remove(_bulletBeams[i]);
                 }
             }
         }
@@ -261,19 +255,19 @@ namespace Project
         public void Draw(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice)
         {
             Vector2 player1DrawPosition = 
-                new Vector2((player1.Position.X + Position.X) * Scale, (player1.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);
+                new Vector2((_player1.Position.X + Position.X) * _scale, (float)((_player1.Position.Y - _screenHeight / 2.0) * _scale + _screenHeight / 2.0));
             Vector2 player2DrawPosition = 
-                new Vector2((player2.Position.X + Position.X) * Scale, (player2.Position.Y - ScreenHeight / 2) * Scale + ScreenHeight / 2);
+                new Vector2((_player2.Position.X + Position.X) * _scale, (float)((_player2.Position.Y - _screenHeight / 2.0) * _scale + _screenHeight / 2.0));
 
-            int screenCenterX = ScreenWidth / 2;
+            int screenCenterX = _screenWidth / 2;
             int playerScreenCenterShiftX = (int)(player1DrawPosition.X - screenCenterX);
-            int shiftSafe = (int)(30 * Scale);
-            if (Position.X * Scale - playerScreenCenterShiftX <= -shiftSafe && 
-                Position.X * Scale + Width - playerScreenCenterShiftX >= ScreenWidth + shiftSafe)
+            int shiftSafe = (int)(30 * _scale);
+            if (Position.X * _scale - playerScreenCenterShiftX <= -shiftSafe && 
+                Position.X * _scale + Width - playerScreenCenterShiftX >= _screenWidth + shiftSafe)
             {
                 player1DrawPosition.X = screenCenterX;
                 Position.X -= playerScreenCenterShiftX;
-                player2DrawPosition.X = (player2.Position.X + Position.X) * Scale;
+                player2DrawPosition.X = (_player2.Position.X + Position.X) * _scale;
             }
 
             // Небо
@@ -283,55 +277,46 @@ namespace Project
             // Границы экрана
             DrawBorders(spriteBatch); 
                 
-            player1.Draw(spriteBatch, player1DrawPosition);
-            player2.Draw(spriteBatch, player2DrawPosition);
+            _player1.Draw(spriteBatch, player1DrawPosition);
+            _player2.Draw(spriteBatch, player2DrawPosition);
 
             // Дымка
             DrawFog(spriteBatch);
 
-            Fade.Draw(spriteBatch);
+            _fade.Draw(spriteBatch);
             
             // Draw the lasers.
-            foreach (Bullet b in bulletBeams)
+            foreach (Bullet b in _bulletBeams)
             {
                 b.Draw(spriteBatch);
             }
 
-            debugDrawer.Clear();
-            debugDrawer.AddDebugLine("Scale", Scale.ToString());
-            debugDrawer.AddDebugLine("Level", Position.X.ToString());
-            debugDrawer.AddDebugLine("PL1dx", player1DrawPosition.X.ToString());
-            debugDrawer.AddDebugLine("PL1x", player1.Position.X.ToString());
-            debugDrawer.AddDebugLine("PL2dx", player2DrawPosition.X.ToString());
-            debugDrawer.AddDebugLine("PL2x", player2.Position.X.ToString());
-            debugDrawer.AddDebugLine("Height", Height.ToString());
-            debugDrawer.AddDebugLine("Bullets", bulletBeams.Count.ToString());
-            debugDrawer.DrawDebugInfo(spriteBatch, graphicsDevice, Color.LightGreen);
-
+            _debugDrawer.Clear();
+            _debugDrawer.AddDebugLine("Scale", _scale.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("Level", Position.X.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("PL1dx", player1DrawPosition.X.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("PL1x", _player1.Position.X.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("PL2dx", player2DrawPosition.X.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("PL2x", _player2.Position.X.ToString(CultureInfo.CurrentCulture));
+            _debugDrawer.AddDebugLine("Height", Height.ToString());
+            _debugDrawer.AddDebugLine("Bullets", _bulletBeams.Count.ToString());
+            _debugDrawer.DrawDebugInfo(spriteBatch, graphicsDevice, Color.LightGreen);
         }
 
         private void DrawSky(SpriteBatch spriteBatch)
         {
-            float proportion = HillsFarTexture.Width / (float)HillsFarTexture.Height;
+            float proportion = _hillsFarTexture.Width / (float)_hillsFarTexture.Height;
 
             spriteBatch.Begin();
-            //Нарисовать фон
-            //spriteBatch.Draw(BackgroundTexture,
-            //    new Rectangle(
-            //        (int)Position.X, // x.zero
-            //        (int)(ScreenHeight / 2 - Height / 2), // y.zero
-            //        Width,
-            //        Height),
-            //    Color.White);
-            int AmountOfTextures = (int)(ScreenWidth / (ScreenWidth * Scale)) + 1;
-            for (int i = -AmountOfTextures; i < 2 * AmountOfTextures; i++)
+            int amountOfTextures = (int)(_screenWidth / (_screenWidth * _scale)) + 1;
+            for (int i = -amountOfTextures; i < 2 * amountOfTextures; i++)
             {
-                spriteBatch.Draw(HillsFarTexture,
+                spriteBatch.Draw(_hillsFarTexture,
                     new Rectangle(
-                        (int)(ScreenWidth / 2 - HillsFarTexture.Width * Scale + i * ScreenWidth * Scale),
-                        (int)(ScreenHeight / 2 - Height / 2),
-                        (int)(ScreenWidth * Scale),
-                        (int)(ScreenWidth * Scale / proportion)),
+                        (int)(_screenWidth / 2.0 - _hillsFarTexture.Width * _scale + i * _screenWidth * _scale),
+                        _screenHeight / 2 - Height / 2,
+                        (int)(_screenWidth * _scale),
+                        (int)(_screenWidth * _scale / proportion)),
                     Color.White);
             }
             spriteBatch.End();
@@ -341,25 +326,22 @@ namespace Project
         {
             spriteBatch.Begin();
 
-            int AmountOfTextures;
-            float Proportion;
-
-            AmountOfTextures = (int)(Width / (Scale * HillsNearTexture.Width));
-            Proportion = HillsNearTexture.Width / (float)GroundTexture.Width;
+            int amountOfTextures = (int)(Width / (_scale * _hillsNearTexture.Width));
+            float proportion = _hillsNearTexture.Width / (float)_groundTexture.Width;
 
             // Нарисовать ближние холмы
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(HillsNearTexture,
+                spriteBatch.Draw(_hillsNearTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)((Position.X * Proportion + HillsNearTexture.Width * i) * Scale), // x.zero
-                        (int)(Position.Y * Scale + ScreenHeight / 2 + Height / 2
-                        - GroundLevel - HillsNearTexture.Height * Scale - 78 * Scale), // y.zero
-                        (int)(HillsNearTexture.Width * Scale), // width
-                        (int)(HillsNearTexture.Height * Scale)), // height
+                        (int)((Position.X * proportion + _hillsNearTexture.Width * i) * _scale), // x.zero
+                        (int)(Position.Y * _scale + _screenHeight / 2.0 + Height / 2.0
+                        - GroundLevel - _hillsNearTexture.Height * _scale - 78 * _scale), // y.zero
+                        (int)(_hillsNearTexture.Width * _scale), // width
+                        (int)(_hillsNearTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, HillsNearTexture.Width, HillsNearTexture.Height),
+                    new Rectangle(0, 0, _hillsNearTexture.Width, _hillsNearTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -367,22 +349,22 @@ namespace Project
                     0);
             }
 
-            AmountOfTextures = (int)(Width / (Scale * TreesFourthTexture.Width));
-            Proportion = TreesFourthTexture.Width / (float)GroundTexture.Width;
+            amountOfTextures = (int)(Width / (_scale * _treesFourthTexture.Width));
+            proportion = _treesFourthTexture.Width / (float)_groundTexture.Width;
 
             // Нарисовать деревья 4
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(TreesFourthTexture,
+                spriteBatch.Draw(_treesFourthTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)((- 150 + Position.X * Proportion + TreesFourthTexture.Width * i) * Scale), // x.zero
-                        (int)(Position.Y * Scale + ScreenHeight / 2 + Height / 2
-                        - GroundLevel - TreesFourthTexture.Height * Scale - 78 * Scale), // y.zero
-                        (int)(TreesFourthTexture.Width * Scale), // width
-                        (int)(TreesFourthTexture.Height * Scale)), // height
+                        (int)((- 150 + Position.X * proportion + _treesFourthTexture.Width * i) * _scale), // x.zero
+                        (int)(Position.Y * _scale + _screenHeight / 2.0 + Height / 2.0
+                        - GroundLevel - _treesFourthTexture.Height * _scale - 78 * _scale), // y.zero
+                        (int)(_treesFourthTexture.Width * _scale), // width
+                        (int)(_treesFourthTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, TreesFourthTexture.Width, TreesFourthTexture.Height),
+                    new Rectangle(0, 0, _treesFourthTexture.Width, _treesFourthTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -390,22 +372,22 @@ namespace Project
                     0);
             }
 
-            AmountOfTextures = (int)(Width / (Scale * TreesThirdTexture.Width));
-            Proportion = TreesThirdTexture.Width / (float)GroundTexture.Width;
+            amountOfTextures = (int)(Width / (_scale * _treesThirdTexture.Width));
+            proportion = _treesThirdTexture.Width / (float)_groundTexture.Width;
 
             // Нарисовать деревья 3
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(TreesThirdTexture,
+                spriteBatch.Draw(_treesThirdTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)((-160 + Position.X * Proportion + TreesThirdTexture.Width * i) * Scale), // x.zero
-                        (int)(Position.Y * Scale + ScreenHeight / 2 + Height / 2
-                        - GroundLevel - TreesThirdTexture.Height * Scale - 62 * Scale), // y.zero
-                        (int)(TreesThirdTexture.Width * Scale), // width
-                        (int)(TreesThirdTexture.Height * Scale)), // height
+                        (int)((-160 + Position.X * proportion + _treesThirdTexture.Width * i) * _scale), // x.zero
+                        (int)(Position.Y * _scale + _screenHeight / 2.0 + Height / 2.0
+                        - GroundLevel - _treesThirdTexture.Height * _scale - 62 * _scale), // y.zero
+                        (int)(_treesThirdTexture.Width * _scale), // width
+                        (int)(_treesThirdTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, TreesThirdTexture.Width, TreesThirdTexture.Height),
+                    new Rectangle(0, 0, _treesThirdTexture.Width, _treesThirdTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -413,22 +395,22 @@ namespace Project
                     0);
             }
 
-            AmountOfTextures = (int)(Width / (Scale * TreesSecondTexture.Width));
-            Proportion = TreesSecondTexture.Width / (float)GroundTexture.Width;
+            amountOfTextures = (int)(Width / (_scale * _treesSecondTexture.Width));
+            proportion = _treesSecondTexture.Width / (float)_groundTexture.Width;
             
             // Нарисовать деревья 2
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(TreesSecondTexture,
+                spriteBatch.Draw(_treesSecondTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)((-140 + Position.X * Proportion + TreesSecondTexture.Width * i) * Scale), // x.zero
-                        (int)(Position.Y * Scale + ScreenHeight / 2 + Height / 2 
-                        - GroundLevel - TreesSecondTexture.Height * Scale - 36 * Scale), // y.zero
-                        (int)(TreesSecondTexture.Width * Scale), // width
-                        (int)(TreesSecondTexture.Height * Scale)), // height
+                        (int)((-140 + Position.X * proportion + _treesSecondTexture.Width * i) * _scale), // x.zero
+                        (int)(Position.Y * _scale + _screenHeight / 2.0 + Height / 2.0 
+                        - GroundLevel - _treesSecondTexture.Height * _scale - 36 * _scale), // y.zero
+                        (int)(_treesSecondTexture.Width * _scale), // width
+                        (int)(_treesSecondTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, TreesSecondTexture.Width, TreesSecondTexture.Height),
+                    new Rectangle(0, 0, _treesSecondTexture.Width, _treesSecondTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -436,22 +418,22 @@ namespace Project
                     0);
             }
 
-            AmountOfTextures = (int)(Width / (Scale * TreesFirstTexture.Width));
-            Proportion = TreesFirstTexture.Width / (float)GroundTexture.Width;
+            amountOfTextures = (int)(Width / (_scale * _treesFirstTexture.Width));
+            proportion = _treesFirstTexture.Width / (float)_groundTexture.Width;
 
             // Нарисовать деревья 1
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(TreesFirstTexture,
+                spriteBatch.Draw(_treesFirstTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)((Position.X * Proportion + TreesFirstTexture.Width * i) * Scale), // x.zero
-                        (int)(Position.Y * Scale + ScreenHeight / 2 + Height / 2 
-                        - GroundLevel - TreesFirstTexture.Height * Scale + 10 * Scale), // y.zero
-                        (int)(TreesFirstTexture.Width * Scale), // width
-                        (int)(TreesFirstTexture.Height * Scale)), // height
+                        (int)((Position.X * proportion + _treesFirstTexture.Width * i) * _scale), // x.zero
+                        (int)(Position.Y * _scale + _screenHeight / 2.0 + Height / 2.0 
+                        - GroundLevel - _treesFirstTexture.Height * _scale + 10 * _scale), // y.zero
+                        (int)(_treesFirstTexture.Width * _scale), // width
+                        (int)(_treesFirstTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, TreesFirstTexture.Width, TreesFirstTexture.Height),
+                    new Rectangle(0, 0, _treesFirstTexture.Width, _treesFirstTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -460,20 +442,20 @@ namespace Project
             }
 
             // Вычисление масшабирования !!!! ЗДЕСЬ НЕТ МАСШТАБИРОВАНИЯ
-            AmountOfTextures = (int)(Width / (Scale * GroundTexture.Width));
+            amountOfTextures = (int)(Width / (_scale * _groundTexture.Width));
             
             // Нарисовать поверхность второй земли
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(GroundTexture,
+                spriteBatch.Draw(_groundTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)(Position.X * Scale + GroundTexture.Width * Scale * i), // x.zero
-                        (int)(Position.Y + ScreenHeight / 2 + Height / 2 - GroundLevel), // y.zero
-                        (int)(GroundTexture.Width * Scale), // width
-                        (int)(GroundTexture.Height * Scale)), // height
+                        (int)(Position.X * _scale + _groundTexture.Width * _scale * i), // x.zero
+                        (int)(Position.Y + _screenHeight / 2.0 + Height / 2.0 - GroundLevel), // y.zero
+                        (int)(_groundTexture.Width * _scale), // width
+                        (int)(_groundTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, GroundTexture.Width, GroundTexture.Height),
+                    new Rectangle(0, 0, _groundTexture.Width, _groundTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -481,20 +463,20 @@ namespace Project
                     0);
             }
 
-            AmountOfTextures = (int)(Width / (Scale * 1.2f * GroundNearTexture.Width));
+            amountOfTextures = (int)(Width / (_scale * 1.2f * _groundNearTexture.Width));
 
             // Нарисовать поверхность земли
-            for (int i = 0; i < AmountOfTextures + 1; i++)
+            for (int i = 0; i < amountOfTextures + 1; i++)
             {
-                spriteBatch.Draw(GroundNearTexture,
+                spriteBatch.Draw(_groundNearTexture,
                     // destination rectangle
                     new Rectangle(
-                        (int)(Position.X * 1.2f + GroundNearTexture.Width * Scale * i), // x.zero
-                        (int)(Position.Y + ScreenHeight / 2 + Height / 2 - GroundNearTexture.Height * Scale), // y.zero
-                        (int)(GroundNearTexture.Width * Scale), // width
-                        (int)(GroundNearTexture.Height * Scale)), // height
+                        (int)(Position.X * 1.2f + _groundNearTexture.Width * _scale * i), // x.zero
+                        (int)(Position.Y + _screenHeight / 2.0 + Height / 2.0 - _groundNearTexture.Height * _scale), // y.zero
+                        (int)(_groundNearTexture.Width * _scale), // width
+                        (int)(_groundNearTexture.Height * _scale)), // height
                     // source
-                    new Rectangle(0, 0, GroundNearTexture.Width, GroundNearTexture.Height),
+                    new Rectangle(0, 0, _groundNearTexture.Width, _groundNearTexture.Height),
                     Color.White,
                     0f,
                     Vector2.Zero,
@@ -508,20 +490,20 @@ namespace Project
         {
             spriteBatch.Begin();
             // Нарисовать границы
-            int BorderHeight = (ScreenHeight - Height) / 2;
-            spriteBatch.Draw(BorderTexture, new Rectangle(0, 0, ScreenWidth, BorderHeight), Color.White); // верхняя
-            spriteBatch.Draw(BorderTexture, new Rectangle(0, ScreenHeight - BorderHeight, ScreenWidth, BorderHeight), Color.White); // нижняя
+            int borderHeight = (_screenHeight - Height) / 2;
+            spriteBatch.Draw(_borderTexture, new Rectangle(0, 0, _screenWidth, borderHeight), Color.White); // верхняя
+            spriteBatch.Draw(_borderTexture, new Rectangle(0, _screenHeight - borderHeight, _screenWidth, borderHeight), Color.White); // нижняя
             spriteBatch.End();
         }
 
         private void DrawFog(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            spriteBatch.Draw(FogTexture,
+            spriteBatch.Draw(_fogTexture,
                 new Rectangle(
                     0,
-                    (int)(ScreenHeight / 2 - Height / 2),
-                    ScreenWidth,
+                    _screenHeight / 2 - Height / 2,
+                    _screenWidth,
                     Height),
                 Color.White);
             spriteBatch.End();
@@ -530,9 +512,9 @@ namespace Project
         protected void FireBullet(GameTime gameTime, Vector2 position, LookDirection lookDirection)
         {
             // govern the rate of fire for our Bullets
-            if (gameTime.TotalGameTime - previousBulletSpawnTime > bulletSpawnTime)
+            if (gameTime.TotalGameTime - _previousBulletSpawnTime > _bulletSpawnTime)
             {
-                previousBulletSpawnTime = gameTime.TotalGameTime;
+                _previousBulletSpawnTime = gameTime.TotalGameTime;
                 // Add the bullet to our list.
                 AddBullet(position, lookDirection);
             }
@@ -542,30 +524,30 @@ namespace Project
         {
             Bullet bullet = new Bullet();
             
-            bullet.Initialize(bulletTexture, position, lookDirection);
+            bullet.Initialize(_bulletTexture, position, lookDirection);
            
-            bulletBeams.Add(bullet);
+            _bulletBeams.Add(bullet);
 
         }
 
         public void Dispose()
         {
             #region
-            GroundTexture.Dispose();
-            GroundNearTexture.Dispose();
-            TreesFirstTexture.Dispose();
-            debugDrawer.Dispose();
-            TreesSecondTexture.Dispose();
-            TreesThirdTexture.Dispose();
-            TreesFourthTexture.Dispose();
-            HillsNearTexture.Dispose();
-            HillsFarTexture.Dispose();
-            BackgroundTexture.Dispose();
-            BorderTexture.Dispose();
-            FogTexture.Dispose();
-            player1.Dispose();
-            player2.Dispose();
-            bulletTexture.Dispose();
+            _groundTexture.Dispose();
+            _groundNearTexture.Dispose();
+            _treesFirstTexture.Dispose();
+            _debugDrawer.Dispose();
+            _treesSecondTexture.Dispose();
+            _treesThirdTexture.Dispose();
+            _treesFourthTexture.Dispose();
+            _hillsNearTexture.Dispose();
+            _hillsFarTexture.Dispose();
+            _backgroundTexture.Dispose();
+            _borderTexture.Dispose();
+            _fogTexture.Dispose();
+            _player1.Dispose();
+            _player2.Dispose();
+            _bulletTexture.Dispose();
             #endregion
         }
     }

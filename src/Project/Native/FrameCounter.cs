@@ -1,30 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
-namespace Native
+namespace Project.Native
 {
     class FrameCounter
     {
-        int frameCounter = 0;
-        public int FPS;
-        float counterTime = 0f;
+        int _frameCounter;
+        public int Fps;
+        float _counterTime;
 
         public void Update(GameTime gameTime)
         {
-            counterTime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (counterTime >= 1000)
+            _counterTime += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (_counterTime >= 1000)
             {
-                FPS = frameCounter;
-                counterTime = 0f;
-                frameCounter = 0;
+                Fps = _frameCounter;
+                _counterTime = 0f;
+                _frameCounter = 0;
             }
 
         }
 
         public void Frame()
         {
-            frameCounter++;
+            _frameCounter++;
         }
     }
 }

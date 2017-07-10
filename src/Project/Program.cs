@@ -1,4 +1,4 @@
-using System;
+using Project.Game;
 
 namespace Project
 {
@@ -8,7 +8,7 @@ namespace Project
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        private static void Main()
         {
             using (GameManager game = new GameManager())
             {

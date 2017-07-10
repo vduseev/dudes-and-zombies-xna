@@ -1,53 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
+using Project.Objects;
 
-namespace Project
+namespace Project.Game
 {
-    public class GameManager : Game
+    public class GameManager : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        SpriteFont font;
+        SpriteBatch _spriteBatch;
 
         // Менеджер уровня
-        Level currentLevel;
+        Level _currentLevel;
 
         // Общеигровые характеристики
         float Scale = 1f;
 
         public GameManager()
         {
-            graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1024;
-            //graphics.PreferredBackBufferHeight = 576;
-            graphics.PreferredBackBufferHeight = 650;
-            graphics.IsFullScreen = false;
+            graphics = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = 1024,
+                PreferredBackBufferHeight = 650,
+                IsFullScreen = false
+            };
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
 
         }
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-        }
-
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Создания объекта: уровень
-            currentLevel = new Level(GraphicsDevice, graphics, Content, Scale);
+            _currentLevel = new Level(GraphicsDevice, graphics, Content, Scale);
 
             // Инициализация уровня
-            currentLevel.LoadContent();
-            font = Content.Load<SpriteFont>("DebugFont");
+            _currentLevel.LoadContent();
         }
 
         protected override void UnloadContent()
@@ -58,9 +48,9 @@ namespace Project
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed
                 || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                this.Exit();
+                Exit();
 
-            currentLevel.Update(gameTime);
+            _currentLevel.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -70,7 +60,7 @@ namespace Project
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
             // Отрисовка уровня
-            currentLevel.Draw(spriteBatch, GraphicsDevice);
+            _currentLevel.Draw(_spriteBatch, GraphicsDevice);
 
             base.Draw(gameTime);
         }

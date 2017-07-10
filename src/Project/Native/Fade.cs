@@ -1,23 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Native
+namespace Project.Native
 {
     public class Fade
     {
         #region Attributes
-        private const int ALPHA_INCREMENT = 3;
-        private const int ALPHA_MIN = 1;
-        private const int ALPHA_MAX = 254;
+        const int AlphaIncrement = 3;
+        const int AlphaMin = 1;
+        const int AlphaMax = 254;
 
-        private Texture2D fadeTexture = null;
-        private bool isFading = false;
-        private int fadeType = 1; // Default fade in
-        private int alpha = ALPHA_MIN;
+        Texture2D _fadeTexture;
+        bool _isFading;
+        int _fadeType = 1; // Default fade in
+        int _alpha = AlphaMin;
   
-        private int posX, posY;
-        private bool visible = false;
-        private Rectangle sourceRect;
+        int _posX, _posY;
+        bool _visible;
+        Rectangle _sourceRect;
         #endregion
 
         #region Constructors
@@ -26,143 +26,143 @@ namespace Native
 
             //Creando textura , todo negro
 
-            fadeTexture = new Texture2D(graphics.GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            _fadeTexture = new Texture2D(graphics.GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
 
-            Color[] data = new Color[fadeTexture.Height * fadeTexture.Width];
+            Color[] data = new Color[_fadeTexture.Height * _fadeTexture.Width];
 
-            for (int i = 0; i < fadeTexture.Height * fadeTexture.Width; i++)
+            for (int i = 0; i < _fadeTexture.Height * _fadeTexture.Width; i++)
             {
 
                 data[i] = Color.Black;
 
             }
-           fadeTexture.SetData(data);
+           _fadeTexture.SetData(data);
 
-           posX = 0;
-           posY = 0;
+           _posX = 0;
+           _posY = 0;
 
-           this.sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
+           _sourceRect = new Rectangle(0, 0, _fadeTexture.Width, _fadeTexture.Height);
         }
 
         public Fade(Texture2D fadeTexture)
         {
-            this.fadeTexture = fadeTexture;
-            posX = 0;
-            posY = 0;
-            this.sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
+            _fadeTexture = fadeTexture;
+            _posX = 0;
+            _posY = 0;
+            _sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
         }
 
         public Fade(Texture2D fadeTexture,int x,int y)
         {
-            this.fadeTexture = fadeTexture;
-            posX = x;
-            posY = y;
-            this.sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
+            _fadeTexture = fadeTexture;
+            _posX = x;
+            _posY = y;
+            _sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
         }
 
         public Fade(Texture2D fadeTexture, int x, int y, bool visible)
         {
-            this.fadeTexture = fadeTexture;
-            posX = x;
-            posY = y;
-            this.visible = visible;
-            this.sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
+            _fadeTexture = fadeTexture;
+            _posX = x;
+            _posY = y;
+            _visible = visible;
+            _sourceRect = new Rectangle(0, 0, fadeTexture.Width, fadeTexture.Height);
         }
 
         public Fade(Texture2D fadeTexture, int x, int y, Rectangle sourceRect)
         {
-            this.fadeTexture = fadeTexture;
-            posX = x;
-            posY = y;
-            this.sourceRect = sourceRect;
+            _fadeTexture = fadeTexture;
+            _posX = x;
+            _posY = y;
+            _sourceRect = sourceRect;
         }
 
         public Fade(Texture2D fadeTexture, int x, int y, Rectangle sourceRect, bool visible)
         {
-            this.fadeTexture = fadeTexture;
-            posX = x;
-            posY = y;
-            this.sourceRect = sourceRect;
-            this.visible = visible;
+            _fadeTexture = fadeTexture;
+            _posX = x;
+            _posY = y;
+            _sourceRect = sourceRect;
+            _visible = visible;
         }
         #endregion
 
         #region Methods
-        public void fadeIn()
+        public void FadeIn()
         {
-            if (!isFading)
+            if (!_isFading)
             {
-                fadeType = 1;
-                isFading = true;
-                alpha = ALPHA_MIN;
+                _fadeType = 1;
+                _isFading = true;
+                _alpha = AlphaMin;
             }
         }
 
-        public void fadeOut()
+        public void FadeOut()
         {
-            if (!isFading)
+            if (!_isFading)
             {
-                fadeType = 2;
-                isFading = true;
-                alpha = ALPHA_MAX;
+                _fadeType = 2;
+                _isFading = true;
+                _alpha = AlphaMax;
             }
 
         }
 
 
-        public void setVisible(bool value)
+        public void SetVisible(bool value)
         {
-            visible = value;
+            _visible = value;
         }
-        public int getX()
+        public int GetX()
         {
-            return posX;
-        }
-
-        public int getY()
-        {
-            return posY;
+            return _posX;
         }
 
-        public void setX(int x)
+        public int GetY()
         {
-            posX = x;
+            return _posY;
         }
 
-        public void setY(int y)
+        public void SetX(int x)
         {
-            posY = y;
+            _posX = x;
         }
 
-        public Texture2D getTexture() 
+        public void SetY(int y)
         {
-            return fadeTexture;
+            _posY = y;
         }
 
-        public void setTexture(Texture2D fadeTexture)
+        public Texture2D GetTexture() 
         {
-            this.fadeTexture = fadeTexture;
+            return _fadeTexture;
+        }
+
+        public void SetTexture(Texture2D fadeTexture)
+        {
+            _fadeTexture = fadeTexture;
         }
 
         public void Update(GameTime gameTime)
         {
            
             //Si esta activo el Fade
-            if (isFading){
+            if (_isFading){
              //segun el tipo del fade, incrementamos o desincrementamos el alpha;
-                switch (fadeType)
+                switch (_fadeType)
                 {
                     case 1:  // Fade In
-                        alpha += ALPHA_INCREMENT;
+                        _alpha += AlphaIncrement;
                         break;
                     case 2: //Fade Out
-                        alpha -= ALPHA_INCREMENT;
+                        _alpha -= AlphaIncrement;
                         break;
                 }
 
 
-                if (alpha >= 255 || alpha <= 0)
-                    isFading = false;
+                if (_alpha >= 255 || _alpha <= 0)
+                    _isFading = false;
             }
 
  
@@ -170,16 +170,16 @@ namespace Native
 
         public  void Draw(SpriteBatch spriteBatch)
         {
-            if (!isFading && visible) {
+            if (!_isFading && _visible) {
                 spriteBatch.Begin();
-                spriteBatch.Draw(fadeTexture, new Vector2(posX, posY), sourceRect, Color.White);
+                spriteBatch.Draw(_fadeTexture, new Vector2(_posX, _posY), _sourceRect, Color.White);
                 spriteBatch.End();
             }
 
-            if (isFading)
+            if (_isFading)
             {
                 spriteBatch.Begin();
-                spriteBatch.Draw(fadeTexture,new Vector2(posX,posY),sourceRect,new Color((byte)255, (byte)255, (byte)255, (byte)alpha));
+                spriteBatch.Draw(_fadeTexture,new Vector2(_posX,_posY),_sourceRect,new Color((byte)255, (byte)255, (byte)255, (byte)_alpha));
                 spriteBatch.End();
             }
         }

@@ -54,7 +54,7 @@
     <Compile Include="Objects\Player.cs" />
     <Compile Include="Objects\Tree.cs" />
     <Compile Include="Objects\ZombieHandler.cs" />
-    <Compile Include="Objects\Zombie\Zombie.cs" />
+    <Compile Include="Objects\Zombie.cs" />
     <Compile Include="Physics\PhysicalObject.cs" />
     <Compile Include="Physics\World.cs" />
     <Compile Include="Program.cs" />

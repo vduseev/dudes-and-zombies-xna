@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Project
+namespace Project.Native
 {
     class Animation
     {
         public Texture2D AnimationStrip;
 
         // характеристики анимации
-        int basicFrameIndex;
-        int basicFrameIndex2;
+        int _basicFrameIndex;
         public int FrameTime;
         public int FrameWidth;
         public int FrameHeight;
-        int framesAmount;
-        int elapsedTime = 0;
+        int _elapsedTime;
 
-        int animationSteps;
-        int currentStep = 0;
-        int framesInStep;
+        int _animationSteps;
+        int _currentStep;
+        int _framesInStep;
 
         public bool AnimationPlaying;
-        bool Active = true;
-        bool Looping = false;
 
-        int currentFrame = 0;
-        int currentFrameInStep = 0;
+        int _currentFrame;
+        int _currentFrameInStep;
         public Vector2 Position;
 
         public void Initialize(Texture2D texture, 
@@ -39,13 +32,11 @@ namespace Project
             int animationSteps,
             int framesInStep)
         {
-            this.AnimationStrip = texture;
-            this.framesAmount = framesAmount;
-            this.basicFrameIndex = basicFrameIndex;
-            this.basicFrameIndex2 = basicFrameIndex2;
-            this.FrameTime = frameTime;
-            this.animationSteps = animationSteps;
-            this.framesInStep = framesInStep;
+            AnimationStrip = texture;
+            _basicFrameIndex = basicFrameIndex;
+            FrameTime = frameTime;
+            _animationSteps = animationSteps;
+            _framesInStep = framesInStep;
 
             // Определить ширину кадра
             FrameWidth = AnimationStrip.Width / framesAmount;
@@ -55,23 +46,23 @@ namespace Project
         {
             if (AnimationPlaying)
             {
-                elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (elapsedTime > FrameTime)
+                _elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_elapsedTime > FrameTime)
                 {
-                    currentFrame++;
-                    currentFrameInStep++;
+                    _currentFrame++;
+                    _currentFrameInStep++;
 
-                    if (currentFrameInStep == framesInStep)
+                    if (_currentFrameInStep == _framesInStep)
                     {
-                        currentFrame = basicFrameIndex;
-                        currentFrameInStep = 0;
-                        elapsedTime = 0;
+                        _currentFrame = _basicFrameIndex;
+                        _currentFrameInStep = 0;
+                        _elapsedTime = 0;
 
                         AnimationPlaying = false;
 
-                        currentStep++;
-                        if (currentStep == animationSteps)
-                            currentStep = 0;
+                        _currentStep++;
+                        if (_currentStep == _animationSteps)
+                            _currentStep = 0;
                     }
                 }
 
@@ -84,7 +75,7 @@ namespace Project
             {
                 AnimationPlaying = true;
 
-                currentFrame = 1 + framesInStep * currentStep;
+                _currentFrame = 1 + _framesInStep * _currentStep;
             }
         }
 
@@ -94,7 +85,7 @@ namespace Project
             spriteBatch.Draw(
                 AnimationStrip, 
                 destination, 
-                new Rectangle(currentFrame * FrameWidth, 0, FrameWidth, AnimationStrip.Height), 
+                new Rectangle(_currentFrame * FrameWidth, 0, FrameWidth, AnimationStrip.Height), 
                 Color.Violet, 0f, 
                 Vector2.Zero, 
                 effects, 0);
