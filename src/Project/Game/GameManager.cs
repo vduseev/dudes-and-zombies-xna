@@ -14,7 +14,7 @@ namespace Project.Game
         Level _currentLevel;
 
         // Общеигровые характеристики
-        float Scale = 1f;
+        float _scale = 1f;
 
         public GameManager()
         {
@@ -34,7 +34,7 @@ namespace Project.Game
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Создания объекта: уровень
-            _currentLevel = new Level(GraphicsDevice, graphics, Content, Scale);
+            _currentLevel = new Level(GraphicsDevice, graphics, Content, _scale);
 
             // Инициализация уровня
             _currentLevel.LoadContent();

@@ -9,7 +9,7 @@ namespace Project.Objects
 {
     enum PlayerState { Care, Repair, Pause, Free }
 
-    enum LookDirection { Left, Right, Up, Down }
+    public enum LookDirection { Left, Right, Up, Down }
 
     class Creature : IDisposable
     {
@@ -109,7 +109,7 @@ namespace Project.Objects
             Position += Speed;
 
             if (Jump)
-                Speed.Y += World.g;
+                Speed.Y += World.G;
 
             if (Position.Y > groundLevel)
             {

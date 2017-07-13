@@ -10,7 +10,7 @@ using Project.Native;
 
 namespace Project.Objects
 {
-    class Level: IDisposable
+    public class Level: IDisposable
     {
         // Характеристики уровня
         #region
@@ -509,7 +509,7 @@ namespace Project.Objects
             spriteBatch.End();
         }
 
-        protected void FireBullet(GameTime gameTime, Vector2 position, LookDirection lookDirection)
+        public virtual void FireBullet(GameTime gameTime, Vector2 position, LookDirection lookDirection)
         {
             // govern the rate of fire for our Bullets
             if (gameTime.TotalGameTime - _previousBulletSpawnTime > _bulletSpawnTime)

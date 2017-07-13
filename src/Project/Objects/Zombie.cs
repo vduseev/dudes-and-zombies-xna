@@ -101,7 +101,7 @@ namespace Project.Objects
             Position += Speed;
 
             if (Jump)
-                Speed.Y += Physics.World.g;
+                Speed.Y += Physics.World.G;
 
             if (Position.Y > groundLevel)
             {

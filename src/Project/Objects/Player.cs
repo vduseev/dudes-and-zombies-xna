@@ -9,8 +9,6 @@ namespace Project.Objects
 {
     enum PlayerState2 { Care, Repair, Pause, Free }
 
-    enum LookDirection2 { Left, Right, Up, Down }
-
     class Player : IDisposable
     {
         // Характеристики игрока
@@ -112,7 +110,7 @@ namespace Project.Objects
             Position += Speed;
 
             if (Jump)
-                Speed.Y += World.g;
+                Speed.Y += World.G;
 
             if (Position.Y > groundLevel)
             {
